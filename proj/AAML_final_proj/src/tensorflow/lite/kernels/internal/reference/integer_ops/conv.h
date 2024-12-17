@@ -153,8 +153,10 @@ inline void ConvPerChannel(
                         const int in_x = in_x_origin + dilation_width_factor * filter_x;
 
                         // Check if the current point is inside the image boundaries
+                        // const bool is_point_inside_image =
+                        //     (in_x >= 0) && (in_x < input_width) && (in_y >= 0) && (in_y < input_height);
                         const bool is_point_inside_image =
-                            (in_x >= 0) && (in_x < input_width) && (in_y >= 0) && (in_y < input_height);
+                            (uint32_t)in_x < (uint32_t)(input_width) && (uint32_t)in_y < (uint32_t)(input_height);
 
                         // Calculate the corresponding column in the im2col matrix
                         int im2col_col = in_channel * filter_height * filter_width + filter_y * filter_width + filter_x;
@@ -260,9 +262,9 @@ inline void ConvPerChannel(
           cfu_op0(7, 0, 0); // set in_valid
 
 
-          while(cfu_op0(4, 0, 0)) {}
+          while(cfu_op0(4, 0, 0)) {} // run systolic array
 
-          // process output of systolic array to C_tile
+          // put output of systolic array to C_tile
           int Tdiv4 = TILE_SIZE / 4;
           int cur_n = 0;
           while (cur_n < Tdiv4) {
