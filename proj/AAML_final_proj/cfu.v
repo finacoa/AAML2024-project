@@ -144,13 +144,14 @@ module Cfu (
   reg         overflow;
   reg [63:0]  ab_64;
   wire [31:0] nudge;
-  wire [63:0] ab_64_nudge;
+  wire [63:0] ab_x2_high32;
+  wire [63:0] _ab_x2_high32_;
   wire [31:0] srdhm;
 
   assign nudge = ab_64[63] ? 32'hc0000001 : 32'h40000000;
-  assign ab_64_nudge = $signed(ab_64) + $signed(nudge);
-  assign srdhm = overflow ? 32'h7fffffff :
-      ab_64_nudge[63] ? -(-ab_64_nudge >> 31) : ab_64_nudge >> 31;
+  assign ab_x2_high32 = $signed(ab_64) + $signed(nudge);
+  assign _ab_x2_high32_ = ab_x2_high32[63] ? -(-ab_x2_high32 >> 31) : ab_x2_high32 >> 31;
+  assign srdhm = overflow ? 32'h7fffffff : _ab_x2_high32_;
 
 /* RDBPOT
   inline IntegerType RoundingDivideByPOT(IntegerType x, int exponent) {
@@ -182,13 +183,13 @@ module Cfu (
       std::min(params.quantized_activation_max,
                std::max(params.quantized_activation_min, raw_output));
 */
-  wire [31:0] add_off;
-  wire [31:0] clamp_max;
-  wire [31:0] clamp_min;
+  wire [31:0] sum;
+  wire [31:0] cut_max;
+  wire [31:0] cut_min;
 
-  assign add_off = cmd_payload_inputs_0 + cmd_payload_inputs_1;
-  assign clamp_max = $signed(add_off) > $signed(-128) ? add_off : $signed(-128);
-  assign clamp_min = $signed(clamp_max) < $signed(127) ? clamp_max : $signed(127);
+  assign sum = cmd_payload_inputs_0 + cmd_payload_inputs_1;
+  assign cut_max = $signed(sum) > $signed(-128) ? sum : $signed(-128);
+  assign cut_min = $signed(cut_max) < $signed(127) ? cut_max : $signed(127);
   
 
   always @(posedge clk) begin
@@ -270,7 +271,7 @@ module Cfu (
                     INIT_FC:begin
                         filter_offset <= cmd_payload_inputs_0;
                         input_offset <= cmd_payload_inputs_1;
-                        rsp_payload_outputs_0 <= 0'b0;
+                        rsp_payload_outputs_0 <= 32'b0;
                     end
                     RST_FC: begin
                         filter_offset <= filter_offset;
@@ -292,7 +293,7 @@ module Cfu (
                     rsp_payload_outputs_0 <= rdbpot;
                   end
                   CUTOFF:begin
-                    rsp_payload_outputs_0 <= clamp_min;
+                    rsp_payload_outputs_0 <= cut_min;
                   end
                   endcase
                 end
@@ -380,4 +381,3 @@ module Cfu (
   );
 
 endmodule
-
