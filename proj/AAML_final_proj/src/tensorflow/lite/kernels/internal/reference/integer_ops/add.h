@@ -107,12 +107,6 @@ inline int32_t cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(
   return cfu_op2(2, val, left_shift);
 }
 
-// for input2 whose shift is always 0, multiplier is always 107374182
-inline int32_t cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(int32_t x) {
-  cfu_op2(0, x, 1073741824);  // 1073741824 = 2^30
-  return cfu_op2(1, 0, 0);
-}
-
 inline int8_t AddFunc(int8_t x, int8_t y, const ArithmeticParams& params) {
   const int32_t input1_val = params.input1_offset + x;
   const int32_t input2_val = params.input2_offset + y;
@@ -123,7 +117,8 @@ inline int8_t AddFunc(int8_t x, int8_t y, const ArithmeticParams& params) {
       cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(
           shifted_input1_val, params.input1_multiplier, params.input1_shift);
   const int32_t scaled_input2_val =
-      cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(shifted_input2_val);
+      cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(
+          shifted_input2_val, params.input2_multiplier, params.input2_shift);
   const int32_t raw_sum = scaled_input1_val + scaled_input2_val;
   const int32_t raw_output = cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(
       raw_sum, params.output_multiplier, params.output_shift);
@@ -156,8 +151,8 @@ inline void Add(const ArithmeticParams& params,
           cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(shifted_input1_val,
                                                              1623821475, 2);
       const int32_t scaled_input2_val =
-          cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(
-              shifted_input2_val);
+          cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(shifted_input2_val,
+                                                             1073741824, 0);
       const int32_t raw_sum = scaled_input1_val + scaled_input2_val;
       const int32_t raw_output =
           cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(raw_sum,
@@ -174,8 +169,8 @@ inline void Add(const ArithmeticParams& params,
           cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(shifted_input1_val,
                                                              1699529983, 2);
       const int32_t scaled_input2_val =
-          cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(
-              shifted_input2_val);
+          cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(shifted_input2_val,
+                                                             1073741824, 0);
       const int32_t raw_sum = scaled_input1_val + scaled_input2_val;
       const int32_t raw_output =
           cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(raw_sum,
@@ -192,8 +187,8 @@ inline void Add(const ArithmeticParams& params,
           cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(shifted_input1_val,
                                                              1657902019, 2);
       const int32_t scaled_input2_val =
-          cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(
-              shifted_input2_val);
+          cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(shifted_input2_val,
+                                                             1073741824, 0);
       const int32_t raw_sum = scaled_input1_val + scaled_input2_val;
       const int32_t raw_output =
           cfu_MultiplyByQuantizedMultiplierSmallerThanOneExp(raw_sum,
