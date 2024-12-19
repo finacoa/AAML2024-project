@@ -3,7 +3,7 @@ module global_buffer_bram #(parameter ADDR_BITS=8, parameter DATA_BITS=8)(
   input                      rst_n,
   input                      ram_en,
   input                      wr_en,
-  input      [ADDR_BITS-1:0] index,
+  input      [ADDR_BITS-1:0] idx,
   input      [DATA_BITS-1:0] data_in,
   output reg [DATA_BITS-1:0] data_out
   );
@@ -15,9 +15,9 @@ module global_buffer_bram #(parameter ADDR_BITS=8, parameter DATA_BITS=8)(
   always @ (negedge clk) begin
     if (ram_en) begin
       if(wr_en) begin
-        gbuff[index] <= data_in;
+        gbuff[idx] <= data_in;
       end else begin
-        data_out <= gbuff[index];
+        data_out <= gbuff[idx];
       end
     end
   end

@@ -22,25 +22,25 @@ module Systolic_Array #(parameter ARRAY_SIZE = 4)(
     );
 
 // parameter ARRAY_SIZE = 4;
-wire [8:0] right_reg [ARRAY_SIZE-1:0][ARRAY_SIZE-1:0];
-wire [7:0] bottom_reg [ARRAY_SIZE-1:0][ARRAY_SIZE-1:0];
-wire [31:0] acc_reg [ARRAY_SIZE-1:0][ARRAY_SIZE-1:0];
+wire [8:0] right [ARRAY_SIZE-1:0][ARRAY_SIZE-1:0];
+wire [7:0] bottom [ARRAY_SIZE-1:0][ARRAY_SIZE-1:0];
+wire [31:0] acc [ARRAY_SIZE-1:0][ARRAY_SIZE-1:0];
 
 
 // output to C
 // always @(posedge clk) begin
 //     integer i;
 //     for (i = 0; i < ARRAY_SIZE; i = i + 1) begin
-//         out[i] = {acc_reg[i][0], acc_reg[i][1], acc_reg[i][2], acc_reg[i][3]};
+//         out[i] = {acc[i][0], acc[i][1], acc[i][2], acc[i][3]};
 //     end
 // end
 
 
 always @(posedge clk) begin
-    out_0 = {acc_reg[0][0], acc_reg[0][1], acc_reg[0][2], acc_reg[0][3]};
-    out_1 = {acc_reg[1][0], acc_reg[1][1], acc_reg[1][2], acc_reg[1][3]};
-    out_2 = {acc_reg[2][0], acc_reg[2][1], acc_reg[2][2], acc_reg[2][3]};
-    out_3 = {acc_reg[3][0], acc_reg[3][1], acc_reg[3][2], acc_reg[3][3]};
+    out_0 = {acc[0][0], acc[0][1], acc[0][2], acc[0][3]};
+    out_1 = {acc[1][0], acc[1][1], acc[1][2], acc[1][3]};
+    out_2 = {acc[2][0], acc[2][1], acc[2][2], acc[2][3]};
+    out_3 = {acc[3][0], acc[3][1], acc[3][2], acc[3][3]};
 
 end
 
@@ -52,11 +52,11 @@ end
 //                 .clk(clk),
 //                 .reset(reset),
 //                 .PE_rst(PE_rst),
-//                 .left_in((j == 0) ? left[i] : right_reg[i][j-1]),
-//                 .top_in((i == 0) ? top[j] : bottom_reg[i-1][j]),
-//                 .right_out(right_reg[i][j]),
-//                 .bottom_out(bottom_reg[i][j]),
-//                 .acc(acc_reg[i][j])
+//                 .left_i((j == 0) ? left[i] : right[i][j-1]),
+//                 .top_i((i == 0) ? top[j] : bottom[i-1][j]),
+//                 .right_o(right[i][j]),
+//                 .bottom_o(bottom[i][j]),
+//                 .acc(acc[i][j])
 //             );
 //         end
 //     end
@@ -70,22 +70,21 @@ generate
                 .clk(clk),
                 .reset(reset),
                 .PE_rst(PE_rst),
-                // .offset(offset),
-                .left_in((j == 0) ?
-                         (i == 0 ? left_0
+                .left_i((j == 0) ?
+                        (i == 0 ? left_0
                         :(i == 1 ? left_1
                         :(i == 2 ? left_2
                         :left_3))
-                        ): right_reg[i][j-1]),
-                .top_in((i == 0) ?
+                        ): right[i][j-1]),
+                .top_i((i == 0) ?
                         (j == 0 ? top_0
                         : (j == 1 ? top_1
                         : (j == 2 ? top_2
                         : top_3))
-                        ) : bottom_reg[i-1][j]),
-                .right_out(right_reg[i][j]),
-                .bottom_out(bottom_reg[i][j]),
-                .acc(acc_reg[i][j])
+                        ) : bottom[i-1][j]),
+                .right_o(right[i][j]),
+                .bottom_o(bottom[i][j]),
+                .acc(acc[i][j])
             );
         end
     end
